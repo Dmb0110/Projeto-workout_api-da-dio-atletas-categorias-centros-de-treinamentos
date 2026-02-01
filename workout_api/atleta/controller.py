@@ -24,6 +24,9 @@ async def post(
     db_session: DatabaseDependency,
     atleta_in: AtletaIn = Body(...)
 ):
+    # Rota POST /
+    # Cria um novo atleta no banco de dados a partir dos dados enviados no corpo da requisição.
+    # Retorna o atleta criado com status 201 (Created).
     return await AtletaService.criar_atleta(db_session, atleta_in)
     
 
@@ -34,6 +37,9 @@ async def post(
     response_model=list[AtletaOut],
 )
 async def query(db_session: DatabaseDependency) -> list[AtletaOut]:
+    # Rota GET /
+    # Consulta todos os atletas cadastrados no banco de dados.
+    # Retorna uma lista de atletas com status 200 (OK).
     return await AtletaService.listar_atletas(db_session)
  
 
@@ -47,6 +53,9 @@ async def get(
     id: UUID4,
     db_session: DatabaseDependency
 ):
+    # Rota GET /{id}
+    # Consulta um atleta específico pelo seu UUID.
+    # Retorna os dados do atleta encontrado com status 200 (OK).
     return await AtletaService.atleta_especifico(id, db_session)
 
 
@@ -61,7 +70,10 @@ async def patch(
     db_session: DatabaseDependency,
     atleta_up: AtletaUpdate = Body(...)
 ) -> AtletaOut:
-    return await AtletaService.atualizar_atleta(id, db_session,atleta_up)
+    # Rota PATCH /{id}
+    # Atualiza parcialmente os dados de um atleta existente, identificado pelo UUID.
+    # Retorna o atleta atualizado com status 200 (OK).
+    return await AtletaService.atualizar_atleta(id, db_session, atleta_up)
  
 
 @router.delete(
@@ -73,4 +85,7 @@ async def delete(
     id: UUID4, 
     db_session: DatabaseDependency
 ) -> None:
+    # Rota DELETE /{id}
+    # Remove um atleta do banco de dados pelo seu UUID.
+    # Não retorna corpo de resposta, apenas status 204 (No Content).
     await AtletaService.deletar_atleta(id, db_session)

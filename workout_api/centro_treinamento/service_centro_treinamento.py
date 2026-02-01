@@ -12,13 +12,18 @@ from workout_api.centro_treinamento.schemas import (
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 
 class CentroTreinamentoService:
+    # Camada de serviço responsável pela lógica de negócio do recurso Centro de Treinamento.
+    # Contém métodos estáticos para criar, listar, consultar, atualizar e deletar centros.
 
     @staticmethod
     async def criar(
         db_session: DatabaseDependency, 
         ct_in: CentroTreinamentoIn
-        ) -> CentroTreinamentoOut:
-
+    ) -> CentroTreinamentoOut:
+        # Criação de um novo centro de treinamento:
+        # 1. Constrói objeto de saída CentroTreinamentoOut com UUID.
+        # 2. Cria modelo ORM CentroTreinamentoModel a partir dos dados.
+        # 3. Persiste no banco e retorna o centro criado.
         ct_out = CentroTreinamentoOut(id=uuid4(), **ct_in.model_dump())
         ct_model = CentroTreinamentoModel(**ct_out.model_dump())
 
@@ -29,6 +34,9 @@ class CentroTreinamentoService:
 
     @staticmethod
     async def listar_todos(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
+        # Listagem de todos os centros de treinamento:
+        # Executa SELECT na tabela de centros.
+        # Retorna lista de CentroTreinamentoOut validados a partir dos modelos ORM.
         result = await db_session.execute(select(CentroTreinamentoModel))
         centros = result.scalars().all()
         return [CentroTreinamentoOut.model_validate(ct) for ct in centros]
@@ -38,8 +46,11 @@ class CentroTreinamentoService:
     async def buscar_por_id(
         id: UUID4, 
         db_session: DatabaseDependency
-        ) -> CentroTreinamentoOut:
-
+    ) -> CentroTreinamentoOut:
+        # Consulta de um centro de treinamento específico:
+        # Busca pelo UUID informado.
+        # Se não encontrar, lança HTTPException 404.
+        # Retorna o centro encontrado validado contra o schema de saída.
         ct = (
             await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
         ).scalars().first()
@@ -58,8 +69,13 @@ class CentroTreinamentoService:
         id: UUID4, 
         db_session: DatabaseDependency, 
         ct_up: CentroTreinamentoUpdate
-        ) -> CentroTreinamentoOut:
-
+    ) -> CentroTreinamentoOut:
+        # Atualização parcial de centro de treinamento:
+        # 1. Busca centro pelo id.
+        # 2. Se não encontrar, lança HTTPException 404.
+        # 3. Aplica atualização apenas nos campos enviados (PATCH).
+        # 4. Comita e atualiza objeto em memória.
+        # 5. Retorna centro atualizado como CentroTreinamentoOut.
         ct: CentroTreinamentoModel = (
             await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
         ).scalars().first()
@@ -84,8 +100,12 @@ class CentroTreinamentoService:
     async def deletar(
         id: UUID4, 
         db_session: DatabaseDependency
-        ) -> None:
-
+    ) -> None:
+        # Exclusão de centro de treinamento:
+        # 1. Busca centro pelo id.
+        # 2. Se não encontrar, lança HTTPException 404.
+        # 3. Remove registro do banco e comita.
+        # Não retorna nada → rota responde com status 204 (No Content).
         ct: CentroTreinamentoModel = (
             await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
         ).scalars().first()
@@ -98,4 +118,3 @@ class CentroTreinamentoService:
 
         await db_session.delete(ct)
         await db_session.commit()
-        # não retorna nada → rota 204

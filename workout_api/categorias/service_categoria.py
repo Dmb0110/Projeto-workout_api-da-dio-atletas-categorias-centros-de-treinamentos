@@ -8,12 +8,19 @@ from workout_api.categorias.schemas import CategoriaIn, CategoriaOut, CategoriaU
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 
 class CategoriaService:
+    # Camada de serviço responsável pela lógica de negócio do recurso Categoria.
+    # Contém métodos estáticos para criar, listar, consultar, atualizar e deletar categorias.
 
     @staticmethod
     async def criar_categoria(
         db_session: DatabaseDependency,
         categoria_in: CategoriaIn
     ) -> CategoriaOut:
+        # Criação de uma nova categoria:
+        # 1. Constrói objeto de saída CategoriaOut com UUID.
+        # 2. Cria modelo ORM CategoriaModel a partir dos dados.
+        # 3. Persiste no banco e retorna a categoria criada.
+        # Em caso de erro, lança HTTPException 500.
         try:
             categoria_out = CategoriaOut(
                 id=uuid4(),
@@ -35,12 +42,11 @@ class CategoriaService:
 
     @staticmethod
     async def listar_categorias(db_session: DatabaseDependency) -> list[CategoriaOut]:
-        """
-        Consulta todas as categorias no banco e retorna como lista de CategoriaOut.
-        """
+        # Listagem de todas as categorias:
+        # Executa SELECT na tabela de categorias.
+        # Retorna lista de CategoriaOut validados a partir dos modelos ORM.
         result = await db_session.execute(select(CategoriaModel))
         categorias = result.scalars().all()
-        # valida cada objeto do ORM contra o schema de saída
         return [CategoriaOut.model_validate(categoria) for categoria in categorias]
 
 
@@ -48,10 +54,11 @@ class CategoriaService:
     async def buscar_por_id(
         id: UUID4, 
         db_session: DatabaseDependency
-        ) -> CategoriaOut:
-        """
-        Consulta uma categoria pelo id.
-        """
+    ) -> CategoriaOut:
+        # Consulta de uma categoria específica:
+        # Busca pelo UUID informado.
+        # Se não encontrar, lança HTTPException 404.
+        # Retorna a categoria encontrada validada contra o schema de saída.
         categoria = (
             await db_session.execute(select(CategoriaModel).filter_by(id=id))
         ).scalars().first()
@@ -62,7 +69,6 @@ class CategoriaService:
                 detail=f"Categoria não encontrada no id: {id}"
             )
 
-        # valida o objeto ORM contra o schema de saída
         return CategoriaOut.model_validate(categoria)
 
 
@@ -71,10 +77,13 @@ class CategoriaService:
         id: UUID4, 
         db_session: DatabaseDependency,
         categoria_up: CategoriaUpdate
-        ) -> CategoriaOut:
-        """
-        Atualizar parcialmente uma categoria pelo id.
-        """
+    ) -> CategoriaOut:
+        # Atualização parcial de categoria:
+        # 1. Busca categoria pelo id.
+        # 2. Se não encontrar, lança HTTPException 404.
+        # 3. Aplica atualização apenas nos campos enviados (PATCH).
+        # 4. Comita e atualiza objeto em memória.
+        # 5. Retorna categoria atualizada como CategoriaOut.
         categoria = (
             await db_session.execute(select(CategoriaModel).filter_by(id=id))
         ).scalars().first()
@@ -85,7 +94,6 @@ class CategoriaService:
                 detail=f"Categoria não encontrada no id: {id}"
             )
         
-        
         categoria_update = categoria_up.model_dump(exclude_unset=True)
         for key, value in categoria_update.items():
             setattr(categoria, key, value)
@@ -93,9 +101,6 @@ class CategoriaService:
         await db_session.commit()
         await db_session.refresh(categoria)
 
-        #return categoria
-
-        # valida o objeto ORM contra o schema de saída
         return CategoriaOut.model_validate(categoria)
 
 
@@ -104,7 +109,11 @@ class CategoriaService:
         id: UUID4, 
         db_session: DatabaseDependency
     ) -> None:
-        
+        # Exclusão de categoria:
+        # 1. Busca categoria pelo id.
+        # 2. Se não encontrar, lança HTTPException 404.
+        # 3. Remove registro do banco e comita.
+        # Não retorna nada → rota responde com status 204 (No Content).
         categoria: CategoriaModel = (
             await db_session.execute(select(CategoriaModel).filter_by(id=id))
         ).scalars().first()
@@ -117,4 +126,3 @@ class CategoriaService:
 
         await db_session.delete(categoria)
         await db_session.commit()
-        # não retorna nada → rota 204
