@@ -11,6 +11,7 @@ from workout_api.centro_treinamento.models import CentroTreinamentoModel
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 
 class AtletaService:
+    
     @staticmethod
     async def criar_atleta(
             db_session: DatabaseDependency, 

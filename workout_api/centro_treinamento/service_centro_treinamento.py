@@ -11,7 +11,6 @@ from workout_api.centro_treinamento.schemas import (
 )
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 
-
 class CentroTreinamentoService:
 
     @staticmethod
@@ -27,11 +26,13 @@ class CentroTreinamentoService:
         await db_session.commit()
         return ct_out
 
+
     @staticmethod
     async def listar_todos(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
         result = await db_session.execute(select(CentroTreinamentoModel))
         centros = result.scalars().all()
         return [CentroTreinamentoOut.model_validate(ct) for ct in centros]
+
 
     @staticmethod
     async def buscar_por_id(
@@ -50,6 +51,7 @@ class CentroTreinamentoService:
             )
 
         return CentroTreinamentoOut.model_validate(ct)
+
 
     @staticmethod
     async def atualizar(
@@ -76,6 +78,7 @@ class CentroTreinamentoService:
         await db_session.refresh(ct)
 
         return CentroTreinamentoOut.model_validate(ct)
+
 
     @staticmethod
     async def deletar(

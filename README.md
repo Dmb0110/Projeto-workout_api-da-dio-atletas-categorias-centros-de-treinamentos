@@ -232,7 +232,7 @@ Exemplo de resposta:
 ### Categoria
 
 GET /atleta
-Lista todos os atletas cadastrados.
+Lista todas as categorias.
 
 Exemplo de resposta:
 [
@@ -271,7 +271,7 @@ Exemplo de resposta:
 
 -------------------------------------
 PATCH /categoria/{id}
-Editar um Atleta pelo id
+Editar uma categoria pelo id
 
 Exemplo de requisiçao:
 
@@ -367,6 +367,7 @@ Exemplo de resposta:
 
 ------------------------------------
 DELETE /centro_treinamento/{id}
+Deletar centro de treinamento
 
 Exemplo de resposta:
 
@@ -397,17 +398,6 @@ docker ps
 - Migrations vazias/falhas: confirme `target_metadata` em `alembic/env.py` aponta para `contrib.models.BaseModel.metadata`.
 - Erro de conexão DB: confirme `DATABASE_URL`/`settings.DB_URL` e se o container Postgres está rodando.
 - Uso de SQLAlchemy async: nos handlers use `async with session.begin():` e `await session.execute(...)`.
-
-## Contribuição
-- Abra issue descrevendo o problema ou a feature.
-- Faça um fork / branch com nome `feat/<descrição>` ou `fix/<descrição>`.
-- Inclua testes quando aplicável.
-
-## Licença
-Adicione aqui a licença do projeto (ex.: MIT) ou apague esta seção se não aplicável.
-
----
-Arquivo `requirements.txt` contém versões testadas; use-as para reproduzir ambiente.
 
 ## Estrutura do projeto
 
@@ -459,7 +449,4 @@ workout_api/
 ├── requirements.txt        # Dependências do projeto
 ├── docker-compose.yml      # Configuração do PostgreSQL
 ├── Dockerfile              # Container da aplicação
-
-
-
 

@@ -23,16 +23,3 @@ class AtletaModel(BaseModel):
     centro_treinamento: Mapped['CentroTreinamentoModel'] = relationship(back_populates='atleta',lazy='selectin')
     
     centro_treinamento_id: Mapped[int] = mapped_column(ForeignKey('centro_treinamento.pk_id'))
-
-    '''
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-
-    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.pk_id"))
-
-    categoria: Mapped["CategoriaModel"] = relationship(back_populates="atleta", lazy="selectin")2
-
-    centro_treinamento_id: Mapped[int] = mapped_column(ForeignKey("centro_treinamento.pk_id"))5
-
-    centro_treinamento: Mapped["CentroTreinamentoModel"] = relationship(back_populates="atleta", lazy="selectin")4
-'''
-    

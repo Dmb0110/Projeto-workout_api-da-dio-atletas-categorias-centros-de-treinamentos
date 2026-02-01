@@ -1,10 +1,9 @@
 from uuid import uuid4
 from pydantic import UUID4
-#from typing import List
 from fastapi import APIRouter, Body, HTTPException, status
+
 from workout_api.centro_treinamento.schemas import CentroTreinamentoIn,CentroTreinamentoOut,CentroTreinamentoUpdate
 from workout_api.centro_treinamento.models import CentroTreinamentoModel
-
 from workout_api.centro_treinamento.service_centro_treinamento import CentroTreinamentoService
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 from sqlalchemy.future import select
@@ -23,15 +22,6 @@ async def post(
 ) -> CentroTreinamentoOut:
     return await CentroTreinamentoService.criar(db_session, ct_in)
 
-'''
-    centro_treinamento_out = CentroTreinamentoOut(id=uuid4(), **centro_treinamento_in.model_dump())
-    centro_treinamento_model = CentroTreinamentoModel(**centro_treinamento_out.model_dump())
-    
-    db_session.add(centro_treinamento_model)
-    await db_session.commit()
-
-    return centro_treinamento_out
-'''
 
 @router.get(
     '/',
@@ -42,13 +32,6 @@ async def post(
 async def query(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
     return await CentroTreinamentoService.listar_todos(db_session)
 
-    '''
-    centro_treinamento_out: list[CentroTreinamentoOut] = (
-        await db_session.execute(select(CentroTreinamentoModel))
-    ).scalars().all()
-
-    return centro_treinamento_out
-'''
 
 @router.get(
     '/{id}',
@@ -62,19 +45,6 @@ async def query(
 ) -> CentroTreinamentoOut:
     return await CentroTreinamentoService.buscar_por_id(id, db_session)
 
-    '''
-    centro_treinamento_out: CentroTreinamentoOut = (
-        await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
-    ).scalars().first()
-
-    if not centro_treinamento_out:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Centro de Treinamento não encontrado no id: {id}'
-        )
-
-    return centro_treinamento_out
-'''
 
 @router.patch(
     '/{id}',
@@ -88,26 +58,6 @@ async def patch(
     ct_up: CentroTreinamentoUpdate = Body(...)
 ) -> CentroTreinamentoOut:
     return await CentroTreinamentoService.atualizar(id, db_session, ct_up)
-'''    
-    centro_treinamento: CentroTreinamentoModel = (
-        await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
-    ).scalars().first()
-
-    if not centro_treinamento:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f'CentroTreinamento não encontrado no id: {id}'
-        )
-    
-    centro_treinamento_update = centro_treinamento_up.model_dump(exclude_unset=True)
-    for key, value in centro_treinamento_update.items():
-        setattr(centro_treinamento, key, value)
-
-    await db_session.commit()
-    await db_session.refresh(centro_treinamento)
-
-    return centro_treinamento
-'''
 
 
 @router.delete(
@@ -120,20 +70,4 @@ async def delete(
     db_session: DatabaseDependency
 ) -> None:
     await CentroTreinamentoService.deletar(id, db_session)
-    '''
-    centro_treinamento: CentroTreinamentoModel = (
-        await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
-    ).scalars().first()
-
-    if not centro_treinamento:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f'centro_treinamento não encontrado no id: {id}'
-        )
-    
-    await db_session.delete(centro_treinamento)
-    await db_session.commit()
-
-    return {'mensagem':'Centro de treinamento deletado com sucesso'}
-'''
     

@@ -2,6 +2,7 @@ from uuid import uuid4
 from pydantic import UUID4
 from sqlalchemy import select
 from fastapi import HTTPException, status
+
 from workout_api.categorias.models import CategoriaModel
 from workout_api.categorias.schemas import CategoriaIn, CategoriaOut, CategoriaUpdate
 from workout_api.contrib.repository.dependencies import DatabaseDependency
