@@ -1,6 +1,7 @@
 import pytest
 '''
 pytest tests/test_categoria.py -v
+
 '''
 @pytest.mark.asyncio
 async def test_crud_categoria(client):

@@ -9,6 +9,7 @@ from workout_api.categorias.models import CategoriaModel
 from workout_api.centro_treinamento.models import CentroTreinamentoModel
 
 from workout_api.contrib.repository.dependencies import DatabaseDependency
+from workout_api.atleta.service_atleta import AtletaService
 from sqlalchemy.future import select
 
 router = APIRouter()
@@ -19,8 +20,13 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     response_model=AtletaOut,
 )
-async def post(db_session: DatabaseDependency,atleta_in: AtletaIn = Body(...)
+async def post(
+    db_session: DatabaseDependency,
+    atleta_in: AtletaIn = Body(...)
 ):
+    return await AtletaService.criar_atleta(db_session, atleta_in)
+    
+    '''
     categoria_nome = atleta_in.categoria.nome
     centro_treinamento_nome = atleta_in.centro_treinamento.nome
   
@@ -57,10 +63,9 @@ async def post(db_session: DatabaseDependency,atleta_in: AtletaIn = Body(...)
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'Ocorreu um erro ao inserir os dados no banco: {str(e)}'
         )
-
-
+    
     return atleta_out
-
+'''
 
 @router.get(
     '/',
@@ -69,17 +74,25 @@ async def post(db_session: DatabaseDependency,atleta_in: AtletaIn = Body(...)
     response_model=list[AtletaOut],
 )
 async def query(db_session: DatabaseDependency) -> list[AtletaOut]:
+    
+    return await AtletaService.listar_atletas(db_session)
+    '''
     atletas: list[AtletaOut] = (await db_session.execute(select(AtletaModel))).scalars().all()
 
     return [AtletaOut.model_validate(atleta) for atleta in atletas]
-
+    '''
 @router.get(
     '/{id}',
     summary='Consultar um Atleta pelo id',
     status_code=status.HTTP_200_OK,
     response_model=AtletaOut,
 )
-async def get(id: UUID4,db_session: DatabaseDependency) -> AtletaOut:
+async def get(
+    id: UUID4,
+    db_session: DatabaseDependency
+):
+    return await AtletaService.atleta_especifico(id, db_session)
+    '''
     atleta: AtletaOut = (
         await db_session.execute(select(AtletaModel).filter_by(id=id))
     ).scalars().first()
@@ -91,14 +104,21 @@ async def get(id: UUID4,db_session: DatabaseDependency) -> AtletaOut:
         )
     
     return atleta
-
+    '''
 @router.patch(
     '/{id}',
     summary='Editar um Atleta pelo id',
     status_code=status.HTTP_200_OK,
     response_model=AtletaOut,
 )
-async def patch(id: UUID4, db_session: DatabaseDependency,atleta_up: AtletaUpdate = Body(...)) -> AtletaOut:
+async def patch(
+    id: UUID4, 
+    db_session: DatabaseDependency,
+    atleta_up: AtletaUpdate = Body(...)
+) -> AtletaOut:
+    
+    return await AtletaService.atualizar_atleta(id, db_session,atleta_up)
+    '''
     atleta: AtletaModel = (
         await db_session.execute(select(AtletaModel).filter_by(id=id))
     ).scalars().first()
@@ -117,14 +137,20 @@ async def patch(id: UUID4, db_session: DatabaseDependency,atleta_up: AtletaUpdat
     await db_session.refresh(atleta)
 
     return atleta
-
+'''
 
 @router.delete(
     '/{id}', 
     summary='Deletar um Atleta pelo id',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
+async def delete(
+    id: UUID4, 
+    db_session: DatabaseDependency
+) -> None:
+    
+    await AtletaService.deletar_atleta(id, db_session)
+    '''
     atleta: AtletaModel = (
         await db_session.execute(select(AtletaModel).filter_by(id=id))
     ).scalars().first()
@@ -139,3 +165,5 @@ async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
     await db_session.commit()
 
     return {'mensagem':'Atleta deletado com sucesso'}
+'''
+    

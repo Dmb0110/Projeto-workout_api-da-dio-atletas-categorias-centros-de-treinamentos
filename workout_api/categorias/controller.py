@@ -5,6 +5,7 @@ from sqlalchemy import select
 from fastapi import APIRouter, Body, status
 from workout_api.categorias.schemas import CategoriaIn,CategoriaOut,CategoriaUpdate
 from workout_api.categorias.models import CategoriaModel
+from workout_api.categorias.service_categoria import CategoriaService
 
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 
@@ -16,7 +17,13 @@ router = APIRouter()
         status_code=status.HTTP_201_CREATED,
         response_model=CategoriaOut,
 )
-async def post(db_session: DatabaseDependency,categoria_in: CategoriaIn = Body(...)) -> CategoriaOut:
+async def criar(
+    db_session: DatabaseDependency,
+    categoria_in: CategoriaIn = Body(...)
+) -> CategoriaOut:
+    
+    return await CategoriaService.criar_categoria(db_session, categoria_in)
+    '''
     categoria_out = CategoriaOut(id=uuid4(),**categoria_in.model_dump())
     categoria_model = CategoriaModel(**categoria_out.model_dump())
     
@@ -24,7 +31,7 @@ async def post(db_session: DatabaseDependency,categoria_in: CategoriaIn = Body(.
     await db_session.commit()
 
     return categoria_out
-
+    '''
 
 @router.get(
     '/',
@@ -32,12 +39,14 @@ async def post(db_session: DatabaseDependency,categoria_in: CategoriaIn = Body(.
     status_code=status.HTTP_200_OK,
     response_model=list[CategoriaOut],
 )
-async def query(db_session: DatabaseDependency) -> List[CategoriaOut]:
+async def listar(db_session: DatabaseDependency) -> List[CategoriaOut]:
+    return await CategoriaService.listar_categorias(db_session)
+    '''
     categorias: list[CategoriaOut] = (await db_session.execute(select(CategoriaModel))
 ).scalars().all()
 
     return categorias
-
+    '''
 
 @router.get(
     '/{id}',
@@ -45,7 +54,13 @@ async def query(db_session: DatabaseDependency) -> List[CategoriaOut]:
     status_code=status.HTTP_200_OK,
     response_model=CategoriaOut,
 )
-async def query(id: UUID4,db_session: DatabaseDependency) -> CategoriaOut:
+async def mostrar_um(
+    id: UUID4,
+    db_session: DatabaseDependency
+) -> CategoriaOut:
+    return await CategoriaService.buscar_por_id(id, db_session)
+    
+    '''
     categoria: CategoriaOut = (await db_session.execute(select(CategoriaModel).filter_by(id=id))
 ).scalars().first()
     
@@ -56,7 +71,7 @@ async def query(id: UUID4,db_session: DatabaseDependency) -> CategoriaOut:
         )
     
     return categoria
-
+'''
 
 @router.patch(
     '/{id}',
@@ -64,7 +79,14 @@ async def query(id: UUID4,db_session: DatabaseDependency) -> CategoriaOut:
     status_code=status.HTTP_200_OK,
     response_model=CategoriaOut,
 )
-async def patch(id: UUID4, db_session: DatabaseDependency, categoria_up: CategoriaUpdate = Body(...)) -> CategoriaOut:
+async def trocar_um(
+    id: UUID4, 
+    db_session: DatabaseDependency, 
+    categoria_up: CategoriaUpdate = Body(...)
+) -> CategoriaOut:
+    return await CategoriaService.trocar_categoria(id, db_session, categoria_up)
+    
+    '''
     categoria: CategoriaModel = (await db_session.execute(select(CategoriaModel).filter_by(id=id))
 ).scalars().first()
 
@@ -82,14 +104,19 @@ async def patch(id: UUID4, db_session: DatabaseDependency, categoria_up: Categor
     await db_session.refresh(categoria)
 
     return categoria
-
+'''
 
 @router.delete(
     '/{id}', 
     summary='Deletar um Categoria pelo id',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
+async def delete(
+    id: UUID4, 
+    db_session: DatabaseDependency
+) -> None:
+    await CategoriaService.deletar_categoria(id, db_session)
+    '''
     categoria: CategoriaModel = (await db_session.execute(select(CategoriaModel).filter_by(id=id))
 ).scalars().first()
 
@@ -103,4 +130,4 @@ async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
     await db_session.commit()
 
     return {'mensagem':'categoria deletada com sucesso'}
-
+'''

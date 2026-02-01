@@ -1,6 +1,7 @@
 import pytest
 '''
 pytest tests/test_centro_treinamento.py -v
+
 '''
 @pytest.mark.asyncio
 async def test_crud_centro_treinamento(client):

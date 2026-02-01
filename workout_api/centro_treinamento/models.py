@@ -1,6 +1,7 @@
 from sqlalchemy import Integer,String
 from sqlalchemy.orm import Mapped,mapped_column,relationship
 from workout_api.contrib.models import BaseModel
+from workout_api.atleta.models import AtletaModel
 
 class CentroTreinamentoModel(BaseModel):
     __tablename__ = 'centro_treinamento'
@@ -9,5 +10,5 @@ class CentroTreinamentoModel(BaseModel):
     nome: Mapped[str] = mapped_column(String(50),unique=True,nullable=False)
     endereco: Mapped[str] = mapped_column(String(60),nullable=False)
     proprietario: Mapped[str] = mapped_column(String(30),nullable=False)
-    atleta: Mapped['AtletaModel'] = relationship(back_populates='centro_treinamento')
+    atleta: Mapped[list[AtletaModel]] = relationship(back_populates='centro_treinamento')
 

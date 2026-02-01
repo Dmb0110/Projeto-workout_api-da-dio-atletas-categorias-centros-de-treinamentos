@@ -460,13 +460,3 @@ workout_api/
 ├── docker-compose.yml      # Configuração do PostgreSQL
 ├── Dockerfile              # Container da aplicação
 
-routers
-requirements-
-rascunhos
-makefile
-maia
-docker compose
-alembic.ini
-contrib
-configs
-venv

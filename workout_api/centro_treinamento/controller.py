@@ -5,6 +5,7 @@ from fastapi import APIRouter, Body, HTTPException, status
 from workout_api.centro_treinamento.schemas import CentroTreinamentoIn,CentroTreinamentoOut,CentroTreinamentoUpdate
 from workout_api.centro_treinamento.models import CentroTreinamentoModel
 
+from workout_api.centro_treinamento.service_centro_treinamento import CentroTreinamentoService
 from workout_api.contrib.repository.dependencies import DatabaseDependency
 from sqlalchemy.future import select
 
@@ -18,8 +19,11 @@ router = APIRouter()
 )
 async def post(
     db_session: DatabaseDependency,
-    centro_treinamento_in: CentroTreinamentoIn = Body(...)
+    ct_in: CentroTreinamentoIn = Body(...)
 ) -> CentroTreinamentoOut:
+    return await CentroTreinamentoService.criar(db_session, ct_in)
+
+'''
     centro_treinamento_out = CentroTreinamentoOut(id=uuid4(), **centro_treinamento_in.model_dump())
     centro_treinamento_model = CentroTreinamentoModel(**centro_treinamento_out.model_dump())
     
@@ -27,7 +31,7 @@ async def post(
     await db_session.commit()
 
     return centro_treinamento_out
-
+'''
 
 @router.get(
     '/',
@@ -36,12 +40,15 @@ async def post(
     response_model=list[CentroTreinamentoOut],
 )
 async def query(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
+    return await CentroTreinamentoService.listar_todos(db_session)
+
+    '''
     centro_treinamento_out: list[CentroTreinamentoOut] = (
         await db_session.execute(select(CentroTreinamentoModel))
     ).scalars().all()
 
     return centro_treinamento_out
-
+'''
 
 @router.get(
     '/{id}',
@@ -49,7 +56,13 @@ async def query(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
     status_code=status.HTTP_200_OK,
     response_model=CentroTreinamentoOut,
 )
-async def query(id: UUID4, db_session: DatabaseDependency) -> CentroTreinamentoOut:
+async def query(
+    id: UUID4, 
+    db_session: DatabaseDependency
+) -> CentroTreinamentoOut:
+    return await CentroTreinamentoService.buscar_por_id(id, db_session)
+
+    '''
     centro_treinamento_out: CentroTreinamentoOut = (
         await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
     ).scalars().first()
@@ -61,7 +74,7 @@ async def query(id: UUID4, db_session: DatabaseDependency) -> CentroTreinamentoO
         )
 
     return centro_treinamento_out
-
+'''
 
 @router.patch(
     '/{id}',
@@ -69,7 +82,13 @@ async def query(id: UUID4, db_session: DatabaseDependency) -> CentroTreinamentoO
     status_code=status.HTTP_200_OK,
     response_model=CentroTreinamentoOut,
 )
-async def patch(id: UUID4, db_session: DatabaseDependency, centro_treinamento_up: CentroTreinamentoUpdate = Body(...)) -> CentroTreinamentoOut:
+async def patch(
+    id: UUID4, 
+    db_session: DatabaseDependency, 
+    ct_up: CentroTreinamentoUpdate = Body(...)
+) -> CentroTreinamentoOut:
+    return await CentroTreinamentoService.atualizar(id, db_session, ct_up)
+'''    
     centro_treinamento: CentroTreinamentoModel = (
         await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
     ).scalars().first()
@@ -88,7 +107,7 @@ async def patch(id: UUID4, db_session: DatabaseDependency, centro_treinamento_up
     await db_session.refresh(centro_treinamento)
 
     return centro_treinamento
-
+'''
 
 
 @router.delete(
@@ -96,7 +115,12 @@ async def patch(id: UUID4, db_session: DatabaseDependency, centro_treinamento_up
     summary='Deletar um Centro_treinamento pelo id',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
+async def delete(
+    id: UUID4, 
+    db_session: DatabaseDependency
+) -> None:
+    await CentroTreinamentoService.deletar(id, db_session)
+    '''
     centro_treinamento: CentroTreinamentoModel = (
         await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id))
     ).scalars().first()
@@ -111,3 +135,5 @@ async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
     await db_session.commit()
 
     return {'mensagem':'Centro de treinamento deletado com sucesso'}
+'''
+    
